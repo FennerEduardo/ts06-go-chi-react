@@ -1,0 +1,67 @@
+version: "1.0"
+projectName: transactional-system-go-chi
+allowedPaths:
+  - specs/**
+  - tests/**
+  - generated-specs/**
+  - src/**
+  - app/**
+  - public/**
+  - views/**
+  - controllers/**
+  - domain/**
+  - frontend/**
+  - src/components/**
+  - src/views/**
+  - cypress/**
+  - e2e/**
+protectedPaths:
+  - .env*
+  - docker-compose.yml
+  - "**/secrets.*"
+  - node_modules/**
+  - vendor/**
+  - .git/**
+  - .github/workflows/**
+  - terraform/**
+  - kubernetes/**
+maxFilesPerTask: 12
+prohibitedImports:
+  go:
+    - ignored_err_check (_ = err)
+  javascript:
+    - express
+    - pg
+    - mysql2
+    - prisma
+    - child_process
+    - fs
+requireHumanApprovalOn:
+  - docker-compose.yml
+  - package.json
+  - package-lock.json
+  - yarn.lock
+  - pnpm-lock.yaml
+  - "*.csproj"
+  - pom.xml
+  - build.gradle
+  - requirements.txt
+  - pyproject.toml
+  - go.mod
+  - go.sum
+  - Gemfile
+  - composer.json
+  - composer.lock
+  - .github/workflows/**
+  - .gitlab-ci.yml
+  - Jenkinsfile
+  - terraform/**
+  - "*.tf"
+  - kubernetes/**
+  - helm/**
+  - vite.config.ts
+  - webpack.config.js
+  - cypress.config.js
+  - cypress.config.ts
+  - vitest.config.ts
+  - playwright.config.ts

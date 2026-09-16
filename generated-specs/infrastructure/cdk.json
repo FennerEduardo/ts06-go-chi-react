@@ -1,0 +1,3 @@
+{
+  "app": "npx ts-node bin/transactional-system-go-chi.ts"
+}

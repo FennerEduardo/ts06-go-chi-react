@@ -1,0 +1,87 @@
+{
+  "version": "1.0",
+  "generatedAt": "2026-09-16T14:16:44.978Z",
+  "createdBy": "gherkin-ai-cli",
+  "artifacts": [
+    {
+      "filePath": "ADR-001-architecture-decisions.md",
+      "type": "other",
+      "checksum": "06e973363047d720197fda49811ffdcb8c762e116bb150e8ee7eccee3e841651"
+    },
+    {
+      "filePath": "openapi.json",
+      "type": "openapi",
+      "checksum": "2784a90775ea5704c20c672a203456fcd54290705bc683086fd8fa006995d9bc"
+    },
+    {
+      "filePath": "asyncapi.json",
+      "type": "contract",
+      "checksum": "42be6e80036d6d240464f9944ad531176e532396684c75c0c5e4be642af207cb"
+    },
+    {
+      "filePath": "orquestacindesagaidempotentecongoroutinesengo122ychi.contract.go",
+      "type": "contract",
+      "checksum": "acfe830975216c655fd5145da4227232e0424c25470290b5a81b322f308ed3b6"
+    },
+    {
+      "filePath": "fixtures.ts",
+      "type": "fixture",
+      "checksum": "879fb08d730c00c139dd4ee9e67901026e28e363daddf4ee3eab511cd59cd1ac"
+    },
+    {
+      "filePath": "seed.sql",
+      "type": "fixture",
+      "checksum": "df772b109f8941a85ea11e7411e6b8dcf94cb98350d1f3d6c769a5196e74ac3d"
+    },
+    {
+      "filePath": "orquestacindesagaidempotentecongoroutinesengo122ychi_test.go",
+      "type": "test",
+      "checksum": "a42d5ad200b82148ff21484176ffe6d252ca48c37b58b0104861607af17a03e1"
+    },
+    {
+      "filePath": "frontend/store/orquestación-de-saga-idempotente-con-goroutines-en-go-1.22-y-chiSlice.ts",
+      "type": "test",
+      "checksum": "2d302709f4ff7ce0d3b3662ef5089641bdf112cce892e4e4633af8fcb7e3770e"
+    },
+    {
+      "filePath": "docker-compose.yml",
+      "type": "config",
+      "checksum": "e46fd32f702260a4b83daa061fa1daa1254db42b36f62e7529434a5429842d3a"
+    },
+    {
+      "filePath": ".env.example",
+      "type": "config",
+      "checksum": "880d710fc633d828719f14b185c48a50ad6ddaa63cb64862f7eec903ac3496e3"
+    },
+    {
+      "filePath": "infrastructure/lib/transactional-system-go-chi-stack.ts",
+      "type": "config",
+      "checksum": "7003b3e1a88e708cf07f7185e4eb547a76b97b805ef74a0c329821a732287779"
+    },
+    {
+      "filePath": "infrastructure/cdk.json",
+      "type": "config",
+      "checksum": "f447bba1a8b3c5fc9053038b98e0c7783c56121d5efdac9d4e0a2f887317b17b"
+    },
+    {
+      "filePath": "infrastructure/package.json",
+      "type": "config",
+      "checksum": "3291834f0a4d8026c57362b18eadf177375ddb96a54445c003454d5a3c48f986"
+    },
+    {
+      "filePath": "prompts/domain-agent.md",
+      "type": "prompt",
+      "checksum": "009b0f15789470aaf429adaf3947776205fe6935899b84f84d160ba7bbc25c30"
+    },
+    {
+      "filePath": "prompts/backend-agent.md",
+      "type": "prompt",
+      "checksum": "009a10e932813031e41aef7df5af26274ff1db4a4d927b58ddf2e4f16c8ba8d5"
+    },
+    {
+      "filePath": "prompts/qa-agent.md",
+      "type": "prompt",
+      "checksum": "6c759e463f18108df5e0a52ce321daacfd2d4ab08391404b6cb653d7d2f3ffdf"
+    }
+  ]
+}

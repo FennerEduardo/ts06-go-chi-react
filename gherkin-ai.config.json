@@ -1,0 +1,28 @@
+{
+  "projectName": "transactional-system-go-chi",
+  "architecture": "monolith",
+  "stack": {
+    "language": "go",
+    "framework": "chi",
+    "orm": "go-orm",
+    "database": "mysql",
+    "validation": "go-validator",
+    "auth": "jwt-bcrypt",
+    "messaging": "none",
+    "testing": "testing"
+  },
+  "frontendStack": {
+    "framework": "react",
+    "language": "javascript",
+    "bundler": "vite",
+    "unitTesting": "vitest",
+    "e2eTesting": "cypress"
+  },
+  "rules": {
+    "bcryptCostFactor": 12,
+    "jwtTtlSeconds": 3600,
+    "strictLayerBoundaries": true,
+    "coverageTarget": 85
+  },
+  "outputDir": "./generated-specs"
+}
