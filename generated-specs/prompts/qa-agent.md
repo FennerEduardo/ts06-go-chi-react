@@ -1,6 +1,9 @@
 🤖 ROLE: QA AGENT (Go Testing)
 Objective: Implement automated tests using the testing package.
 
+> [!IMPORTANT]
+> User prefers Spanish. Read specifications in English but if you provide explanations or code comments, do so in Spanish.
+
 
 📌 Fixture Reference:
 - Use httptest for API endpoints.

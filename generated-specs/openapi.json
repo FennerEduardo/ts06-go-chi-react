@@ -9,7 +9,7 @@
     "/api/v1/orquestaci-n-de-saga-idempotente-con-goroutines-en-go-1-22-y-chi": {
       "post": {
         "summary": "POST /api/v1/orquestaci-n-de-saga-idempotente-con-goroutines-en-go-1-22-y-chi",
-        "operationId": "processOrquestacindeSagaIdempotenteconGoroutinesenGoychi",
+        "operationId": "processOrquestacionDeSagaIdempotenteConGoroutinesEnGo122YChi",
         "security": [],
         "requestBody": {
           "required": true,

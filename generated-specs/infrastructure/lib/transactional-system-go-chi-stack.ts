@@ -7,6 +7,8 @@ import * as subscriptions from 'aws-cdk-lib/aws-sns-subscriptions';
 import * as dynamodb from 'aws-cdk-lib/aws-dynamodb';
 import * as eks from 'aws-cdk-lib/aws-eks';
 import * as ec2 from 'aws-cdk-lib/aws-ec2';
+import * as iam from 'aws-cdk-lib/aws-iam';
+import * as secretsmanager from 'aws-cdk-lib/aws-secretsmanager';
 
 export class TransactionalSystemGoChiInfrastructureStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
@@ -42,7 +44,6 @@ export class TransactionalSystemGoChiInfrastructureStack extends cdk.Stack {
       },
     });
 
-    // SNS FIFO -> SQS FIFO Subscription with rawMessageDelivery enabled
     domainEventsTopic.addSubscription(new subscriptions.SqsSubscription(consumerQueue, {
       rawMessageDelivery: true,
     }));
@@ -54,10 +55,22 @@ export class TransactionalSystemGoChiInfrastructureStack extends cdk.Stack {
       partitionKey: { name: 'pk', type: dynamodb.AttributeType.STRING },
       sortKey: { name: 'sk', type: dynamodb.AttributeType.STRING },
       billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
-      removalPolicy: cdk.RemovalPolicy.RETAIN, // Para entornos de producción
+      removalPolicy: cdk.RemovalPolicy.RETAIN,
     });
 
-    // 5. Clúster EKS Básico (Infraestructura de Cómputo)
+    // 5. Secrets Manager: Database Credentials
+    // ---------------------------------------------------------
+    const dbCredentialsSecret = new secretsmanager.Secret(this, 'DbCredentialsSecret', {
+      secretName: `${id}-db-credentials`,
+      description: 'Database credentials for the microservice',
+      generateSecretString: {
+        secretStringTemplate: JSON.stringify({ username: 'dbadmin' }),
+        generateStringKey: 'password',
+        excludeCharacters: '"@/\\',
+      },
+    });
+
+    // 6. Clúster EKS Básico con IAM Roles for Service Accounts (IRSA)
     // ---------------------------------------------------------
     const vpc = new ec2.Vpc(this, 'EksVpc', { maxAzs: 2 });
     const cluster = new eks.Cluster(this, 'ServiceCluster', {
@@ -66,5 +79,25 @@ export class TransactionalSystemGoChiInfrastructureStack extends cdk.Stack {
       defaultCapacity: 2,
       version: eks.KubernetesVersion.V1_29,
     });
+
+    // Define IAM Role for Kubernetes Service Account (IRSA)
+    const serviceAccountRole = new iam.Role(this, 'MicroserviceExecutionRole', {
+      assumedBy: new iam.WebIdentityPrincipal(
+        cluster.openIdConnectProvider.openIdConnectProviderArn
+      ).withConditions({
+        StringEquals: new cdk.CfnJson(this, 'ConditionJson', {
+          value: {
+            [`${cluster.openIdConnectProvider.openIdConnectProviderIssuer}:aud`]: 'sts.amazonaws.com',
+            [`${cluster.openIdConnectProvider.openIdConnectProviderIssuer}:sub`]: 'system:serviceaccount:default:microservice-sa',
+          },
+        }),
+      }),
+    });
+
+    // Grant least-privilege permissions to the IRSA Role
+    domainEventsTopic.grantPublish(serviceAccountRole);
+    consumerQueue.grantConsumeMessages(serviceAccountRole);
+    readModelTable.grantReadWriteData(serviceAccountRole);
+    dbCredentialsSecret.grantRead(serviceAccountRole);
   }
 }
