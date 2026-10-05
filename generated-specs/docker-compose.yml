@@ -3,7 +3,7 @@ version: '3.8'
 services:
   # Host Environment SDK Isolation Sandbox
   app:
-    image: golang:1.22-alpine
+    image: golang:1.22
     container_name: transactional-system-go-chi-app
     volumes:
       - .:/app

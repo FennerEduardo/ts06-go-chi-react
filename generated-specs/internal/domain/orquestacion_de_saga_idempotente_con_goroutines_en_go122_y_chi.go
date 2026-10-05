@@ -52,6 +52,17 @@ func NewOrquestacionDeSagaIdempotenteConGoroutinesEnGo122YChiAggregate(id string
 	return &OrquestacionDeSagaIdempotenteConGoroutinesEnGo122YChiAggregate{ID: id, State: StatePending}, nil
 }
 
+// RestoreOrquestacionDeSagaIdempotenteConGoroutinesEnGo122YChiAggregate rebuilds an aggregate from persisted state; no events are recorded.
+func RestoreOrquestacionDeSagaIdempotenteConGoroutinesEnGo122YChiAggregate(id string, state State, version int64) (*OrquestacionDeSagaIdempotenteConGoroutinesEnGo122YChiAggregate, error) {
+	a, err := NewOrquestacionDeSagaIdempotenteConGoroutinesEnGo122YChiAggregate(id)
+	if err != nil {
+		return nil, err
+	}
+	a.State = state
+	a.Version = version
+	return a, nil
+}
+
 // PendingEvents returns the events recorded since the aggregate was loaded (to be saved via the outbox).
 func (a *OrquestacionDeSagaIdempotenteConGoroutinesEnGo122YChiAggregate) PendingEvents() []DomainEvent {
 	return append([]DomainEvent(nil), a.pendingEvents...)

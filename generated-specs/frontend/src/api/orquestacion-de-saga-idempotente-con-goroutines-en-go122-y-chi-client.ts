@@ -22,11 +22,29 @@ export interface ClientOptions {
   baseUrl?: string;
   tenantId?: string;
   fetch?: typeof fetch;
+  /**
+   * W3C trace context sent as the traceparent header, so the backend's spans join the caller's trace.
+   * Default: a new sampled root context per request. Pass a function to propagate an existing trace
+   * (e.g. from @opentelemetry/api), or false to send none.
+   */
+  traceparent?: false | (() => string | undefined);
 }
 
 export interface ExecuteOptions {
   /** Sent as X-Idempotency-Key so retries are safe. */
   idempotencyKey?: string;
+}
+
+const hex = (bytes: number) => {
+  const values = new Uint8Array(bytes);
+  if (globalThis.crypto?.getRandomValues) globalThis.crypto.getRandomValues(values);
+  else for (let i = 0; i < bytes; i++) values[i] = Math.floor(Math.random() * 256);
+  return Array.from(values, v => v.toString(16).padStart(2, '0')).join('');
+};
+
+/** A new sampled W3C traceparent (version 00) for a request that starts a trace. */
+export function newTraceparent(): string {
+  return `00-${hex(16)}-${hex(8)}-01`;
 }
 
 export function createOrquestacionDeSagaIdempotenteConGoroutinesEnGo122YChiClient(options: ClientOptions = {}) {
@@ -37,6 +55,8 @@ export function createOrquestacionDeSagaIdempotenteConGoroutinesEnGo122YChiClien
     const headers: Record<string, string> = { 'Content-Type': 'application/json', Accept: 'application/json' };
     if (options.tenantId) headers['X-Tenant-Id'] = options.tenantId;
     if (opts.idempotencyKey) headers['X-Idempotency-Key'] = opts.idempotencyKey;
+    const traceparent = options.traceparent === false ? undefined : (options.traceparent ?? newTraceparent)();
+    if (traceparent) headers.traceparent = traceparent;
 
     const res = await doFetch(`${baseUrl}/api/v1/orquestacion-de-saga-idempotente-con-goroutines-en-go122-y-chi/${encodeURIComponent(id)}/${command}`, {
       method: 'POST',
