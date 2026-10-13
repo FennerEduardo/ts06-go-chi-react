@@ -10,7 +10,7 @@ describe('OrquestacionDeSagaIdempotenteConGoroutinesEnGo122YChiPanel', () => {
   it('executes a command and lists the resulting event', async () => {
     const client = { execute: vi.fn().mockResolvedValue({ type: 'ProcessOrquestacionDeSagaIdempotenteConGoroutinesEnGo122YChiCompleted', aggregateId: 'agg-1', version: 1 }) } as unknown as OrquestacionDeSagaIdempotenteConGoroutinesEnGo122YChiClient;
     render(
-      <Provider store={createAppStore(client)}>
+      <Provider store={createAppStore({ orquestacionDeSagaIdempotenteConGoroutinesEnGo122YChi: client })}>
         <OrquestacionDeSagaIdempotenteConGoroutinesEnGo122YChiPanel />
       </Provider>
     );
@@ -24,7 +24,7 @@ describe('OrquestacionDeSagaIdempotenteConGoroutinesEnGo122YChiPanel', () => {
 
   it('disables commands until an aggregate id is entered', () => {
     render(
-      <Provider store={createAppStore({ execute: vi.fn() } as unknown as OrquestacionDeSagaIdempotenteConGoroutinesEnGo122YChiClient)}>
+      <Provider store={createAppStore({ orquestacionDeSagaIdempotenteConGoroutinesEnGo122YChi: { execute: vi.fn() } as unknown as OrquestacionDeSagaIdempotenteConGoroutinesEnGo122YChiClient })}>
         <OrquestacionDeSagaIdempotenteConGoroutinesEnGo122YChiPanel />
       </Provider>
     );

@@ -3,16 +3,17 @@ version: '3.8'
 services:
   # Host Environment SDK Isolation Sandbox
   app:
-    image: golang:1.22
+    image: golang:1.26
     container_name: transactional-system-go-chi-app
     volumes:
       - .:/app
     working_dir: /app
     environment:
-      - ENVIRONMENT=development
-      - DATABASE_URL=${DATABASE_URL:-mysql://dev_user:dev_password@mysql:5432/transactional-system-go-chi_db}
+      - APP_ENV=development
+      - PORT=8080
+      - DATABASE_URL=${DATABASE_URL:-mysql://dev_user:dev_password@mysql:3306/transactional-system-go-chi_db}
     ports:
-      - "8000:8000"
+      - "8080:8080"
     depends_on:
       - mysql
 

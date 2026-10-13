@@ -16,14 +16,49 @@ import (
 	"transactional-system-go-chi/internal/domain"
 )
 
-const aggregateType = "OrquestacionDeSagaIdempotenteConGoroutinesEnGo122YChi"
+// DefaultAggregate is the aggregate type used when a request does not name one.
+const DefaultAggregate = "OrquestacionDeSagaIdempotenteConGoroutinesEnGo122YChi"
 
-var commands = map[string]func(*domain.OrquestacionDeSagaIdempotenteConGoroutinesEnGo122YChiAggregate, domain.Command) (domain.DomainEvent, error){
-	"process_orquestacion_de_saga_idempotente_con_goroutines_en_go122_y_chi": func(a *domain.OrquestacionDeSagaIdempotenteConGoroutinesEnGo122YChiAggregate, c domain.Command) (domain.DomainEvent, error) { return a.ProcessOrquestacionDeSagaIdempotenteConGoroutinesEnGo122YChi(c) },
+// applied is an aggregate's new state after a command and the recorded event.
+type applied struct {
+	state   string
+	version int64
+	event   domain.DomainEvent
+}
+
+type aggregateFunc func(id string, state *string, version int64, command string, cmd domain.Command) (applied, error)
+
+// aggregates holds every aggregate of the service, by aggregate type.
+var aggregates = map[string]aggregateFunc{
+	"OrquestacionDeSagaIdempotenteConGoroutinesEnGo122YChi": func(id string, state *string, version int64, command string, cmd domain.Command) (applied, error) {
+		var aggregate *domain.OrquestacionDeSagaIdempotenteConGoroutinesEnGo122YChiAggregate
+		var err error
+		if state == nil {
+			aggregate, err = domain.NewOrquestacionDeSagaIdempotenteConGoroutinesEnGo122YChiAggregate(id)
+		} else {
+			aggregate, err = domain.RestoreOrquestacionDeSagaIdempotenteConGoroutinesEnGo122YChiAggregate(id, domain.State(*state), version)
+		}
+		if err != nil {
+			return applied{}, err
+		}
+		var event domain.DomainEvent
+		switch command {
+		case "process_orquestacion_de_saga_idempotente_con_goroutines_en_go122_y_chi":
+			event, err = aggregate.ProcessOrquestacionDeSagaIdempotenteConGoroutinesEnGo122YChi(cmd)
+		default:
+			return applied{}, fmt.Errorf("%w: unknown command %s", domain.ErrValidation, command)
+		}
+		if err != nil {
+			return applied{}, err
+		}
+		return applied{state: string(aggregate.State), version: aggregate.Version, event: event}, nil
+	},
 }
 
 type CommandRequest struct {
-	TenantID       string
+	TenantID string
+	// AggregateType is the feature's aggregate (e.g. "OrquestacionDeSagaIdempotenteConGoroutinesEnGo122YChi"); empty means DefaultAggregate.
+	AggregateType  string
 	AggregateID    string
 	Command        string
 	Payload        map[string]any
@@ -58,7 +93,15 @@ func (svc *CommandService) Handle(ctx context.Context, req CommandRequest) (resu
 	if req.TenantID == "" {
 		return result, fmt.Errorf("%w: tenant id is required", domain.ErrValidation)
 	}
-	ctx, span := Tracer().Start(ContextFrom(ctx, req.Traceparent), "OrquestacionDeSagaIdempotenteConGoroutinesEnGo122YChi."+req.Command,
+	aggregateType := req.AggregateType
+	if aggregateType == "" {
+		aggregateType = DefaultAggregate
+	}
+	apply, ok := aggregates[aggregateType]
+	if !ok {
+		return result, fmt.Errorf("%w: unknown aggregate type %s", domain.ErrValidation, aggregateType)
+	}
+	ctx, span := Tracer().Start(ContextFrom(ctx, req.Traceparent), aggregateType+"."+req.Command,
 		trace.WithSpanKind(trace.SpanKindInternal),
 		trace.WithAttributes(attribute.String("tenant.id", req.TenantID), attribute.String("aggregate.id", req.AggregateID)))
 	defer func() {
@@ -102,28 +145,25 @@ func (svc *CommandService) Handle(ctx context.Context, req CommandRequest) (resu
 
 	var state string
 	var version int64
-	var aggregate *domain.OrquestacionDeSagaIdempotenteConGoroutinesEnGo122YChiAggregate
+	var loaded *string
 	err = tx.QueryRow(ctx, "SELECT state, version FROM "+svc.s+".ghk_aggregates WHERE tenant_id = $1 AND aggregate_type = $2 AND id = $3 FOR UPDATE", req.TenantID, aggregateType, req.AggregateID).Scan(&state, &version)
 	switch {
 	case errors.Is(err, pgx.ErrNoRows):
-		aggregate, err = domain.NewOrquestacionDeSagaIdempotenteConGoroutinesEnGo122YChiAggregate(req.AggregateID)
+		err = nil
 	case err == nil:
-		aggregate, err = domain.RestoreOrquestacionDeSagaIdempotenteConGoroutinesEnGo122YChiAggregate(req.AggregateID, domain.State(state), version)
+		loaded = &state
 	}
 	if err != nil {
 		return result, err
 	}
-	handler, ok := commands[req.Command]
-	if !ok {
-		return result, fmt.Errorf("%w: unknown command %s", domain.ErrValidation, req.Command)
-	}
-	event, err := handler(aggregate, domain.Command{ID: req.AggregateID, Payload: req.Payload})
+	done, err := apply(req.AggregateID, loaded, version, req.Command, domain.Command{ID: req.AggregateID, Payload: req.Payload})
 	if err != nil {
 		return result, err
 	}
+	event := done.event
 	if _, err = tx.Exec(ctx, "INSERT INTO "+svc.s+".ghk_aggregates (tenant_id, aggregate_type, id, state, version) VALUES ($1, $2, $3, $4, $5) "+
 		"ON CONFLICT (tenant_id, aggregate_type, id) DO UPDATE SET state = EXCLUDED.state, version = EXCLUDED.version, updated_at = now()",
-		req.TenantID, aggregateType, req.AggregateID, string(aggregate.State), aggregate.Version); err != nil {
+		req.TenantID, aggregateType, req.AggregateID, done.state, done.version); err != nil {
 		return result, err
 	}
 	payload, err := json.Marshal(event)
@@ -156,6 +196,11 @@ type Snapshot struct {
 
 // Load returns the aggregate as tenantID sees it (nil for other tenants' aggregates).
 func (svc *CommandService) Load(ctx context.Context, tenantID, aggregateID string) (*Snapshot, error) {
+	return svc.LoadType(ctx, DefaultAggregate, tenantID, aggregateID)
+}
+
+// LoadType is Load for a given aggregate type.
+func (svc *CommandService) LoadType(ctx context.Context, aggregateType, tenantID, aggregateID string) (*Snapshot, error) {
 	var snap Snapshot
 	err := svc.pool.QueryRow(ctx, "SELECT state, version FROM "+svc.s+".ghk_aggregates WHERE tenant_id = $1 AND aggregate_type = $2 AND id = $3", tenantID, aggregateType, aggregateID).Scan(&snap.State, &snap.Version)
 	if errors.Is(err, pgx.ErrNoRows) {

@@ -15,9 +15,9 @@ export interface ExecuteArgs {
   payload?: Record<string, unknown>;
 }
 
-export const executeCommand = createAsyncThunk<CommandResult, ExecuteArgs, { extra: { client: OrquestacionDeSagaIdempotenteConGoroutinesEnGo122YChiClient } }>(
+export const executeCommand = createAsyncThunk<CommandResult, ExecuteArgs, { extra: { clients: { orquestacionDeSagaIdempotenteConGoroutinesEnGo122YChi: OrquestacionDeSagaIdempotenteConGoroutinesEnGo122YChiClient } } }>(
   'orquestacionDeSagaIdempotenteConGoroutinesEnGo122YChi/execute',
-  ({ id, command, payload }, { extra }) => extra.client.execute(id, command, payload, { idempotencyKey: crypto.randomUUID() })
+  ({ id, command, payload }, { extra }) => extra.clients.orquestacionDeSagaIdempotenteConGoroutinesEnGo122YChi.execute(id, command, payload, { idempotencyKey: crypto.randomUUID() })
 );
 
 const orquestacionDeSagaIdempotenteConGoroutinesEnGo122YChiSlice = createSlice({

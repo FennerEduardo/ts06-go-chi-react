@@ -9,7 +9,7 @@ Project requiring structured implementation matching Gherkin specification.
 ## Decisions
 - **Architecture Style**: Monolith Architecture (MVC / Monolithic) (monolith)
 - **Primary Backend Language**: go
-- **Backend Framework**: chi (Go 1.22+)
+- **Backend Framework**: chi (Go 1.26+)
 - **ORM / Persistence**: go-orm (gorm.io/gorm v1.25.7)
 - **Validation**: go-validator (github.com/go-playground/validator/v10)
 - **Authentication**: jwt-bcrypt (bcrypt cost factor 12, JWT TTL 3600s)

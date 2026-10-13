@@ -18,7 +18,7 @@ func TopologyFor(prefix string) Topology {
 	return Topology{prefix + ".events", prefix + ".consumer", prefix + ".dlx", prefix + ".dlq"}
 }
 
-var DefaultTopology = Topology{"orquestacion-de-saga-idempotente-con-goroutines-en-go122-y-chi.events", "orquestacion-de-saga-idempotente-con-goroutines-en-go122-y-chi.consumer", "orquestacion-de-saga-idempotente-con-goroutines-en-go122-y-chi.dlx", "orquestacion-de-saga-idempotente-con-goroutines-en-go122-y-chi.dlq"}
+var DefaultTopology = Topology{"transactional-system-go-chi.events", "transactional-system-go-chi.consumer", "transactional-system-go-chi.dlx", "transactional-system-go-chi.dlq"}
 
 // DeclareTopology declares a topic exchange -> consumer queue that dead-letters to a fanout DLX -> DLQ.
 func DeclareTopology(ch *amqp.Channel, t Topology) error {

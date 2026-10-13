@@ -3,40 +3,19 @@
 package domain
 
 import (
-	"errors"
 	"fmt"
 	"strings"
 	"time"
 )
 
-// ErrValidation is wrapped by every domain validation failure.
-var ErrValidation = errors.New("domain validation error")
-
-type State string
-
 const (
-	StatePending State = "PENDING"
+	OrquestacionDeSagaIdempotenteConGoroutinesEnGo122YChiStatePending State = "PENDING"
 )
 
-type EventType string
-
 const (
-	EventProcessOrquestacionDeSagaIdempotenteConGoroutinesEnGo122YChiCompleted EventType = "ProcessOrquestacionDeSagaIdempotenteConGoroutinesEnGo122YChiCompleted"
-	EventOrquestacionDeSagaIdempotenteConGoroutinesEnGo122YChiProcessed EventType = "OrquestacionDeSagaIdempotenteConGoroutinesEnGo122YChiProcessed"
+	OrquestacionDeSagaIdempotenteConGoroutinesEnGo122YChiEventProcessOrquestacionDeSagaIdempotenteConGoroutinesEnGo122YChiCompleted EventType = "ProcessOrquestacionDeSagaIdempotenteConGoroutinesEnGo122YChiCompleted"
+	OrquestacionDeSagaIdempotenteConGoroutinesEnGo122YChiEventOrquestacionDeSagaIdempotenteConGoroutinesEnGo122YChiProcessed EventType = "OrquestacionDeSagaIdempotenteConGoroutinesEnGo122YChiProcessed"
 )
-
-type Command struct {
-	ID      string
-	Payload map[string]any
-}
-
-type DomainEvent struct {
-	Type        EventType
-	AggregateID string
-	Version     int64
-	OccurredOn  time.Time
-	Payload     map[string]any
-}
 
 type OrquestacionDeSagaIdempotenteConGoroutinesEnGo122YChiAggregate struct {
 	ID            string
@@ -49,7 +28,7 @@ func NewOrquestacionDeSagaIdempotenteConGoroutinesEnGo122YChiAggregate(id string
 	if strings.TrimSpace(id) == "" {
 		return nil, fmt.Errorf("%w: OrquestacionDeSagaIdempotenteConGoroutinesEnGo122YChi id is required", ErrValidation)
 	}
-	return &OrquestacionDeSagaIdempotenteConGoroutinesEnGo122YChiAggregate{ID: id, State: StatePending}, nil
+	return &OrquestacionDeSagaIdempotenteConGoroutinesEnGo122YChiAggregate{ID: id, State: OrquestacionDeSagaIdempotenteConGoroutinesEnGo122YChiStatePending}, nil
 }
 
 // RestoreOrquestacionDeSagaIdempotenteConGoroutinesEnGo122YChiAggregate rebuilds an aggregate from persisted state; no events are recorded.
@@ -72,7 +51,7 @@ func (a *OrquestacionDeSagaIdempotenteConGoroutinesEnGo122YChiAggregate) Process
 	if err := a.assertValid(cmd); err != nil {
 		return DomainEvent{}, err
 	}
-	return a.record(EventProcessOrquestacionDeSagaIdempotenteConGoroutinesEnGo122YChiCompleted, cmd.Payload), nil
+	return a.record(OrquestacionDeSagaIdempotenteConGoroutinesEnGo122YChiEventProcessOrquestacionDeSagaIdempotenteConGoroutinesEnGo122YChiCompleted, cmd.Payload), nil
 }
 
 func (a *OrquestacionDeSagaIdempotenteConGoroutinesEnGo122YChiAggregate) assertValid(cmd Command) error {

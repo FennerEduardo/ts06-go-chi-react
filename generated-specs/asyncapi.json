@@ -1,9 +1,9 @@
 {
   "asyncapi": "2.6.0",
   "info": {
-    "title": "Orquestación de Saga Idempotente con Goroutines en Go 1.22 y chi AsyncAPI Specification",
+    "title": "transactional-system-go-chi Events",
     "version": "1.0.0",
-    "description": "Auto-generated AsyncAPI events for Orquestación de Saga Idempotente con Goroutines en Go 1.22 y chi from Gherkin feature spec."
+    "description": "Events of transactional-system-go-chi, merged from 1 feature contract(s) in contracts/."
   },
   "defaultContentType": "application/json",
   "channels": {}

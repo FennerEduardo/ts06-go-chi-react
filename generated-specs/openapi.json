@@ -1,9 +1,9 @@
 {
   "openapi": "3.0.3",
   "info": {
-    "title": "Orquestación de Saga Idempotente con Goroutines en Go 1.22 y chi API Specification",
+    "title": "transactional-system-go-chi API",
     "version": "1.0.0",
-    "description": "Auto-generated OpenAPI specification for Orquestación de Saga Idempotente con Goroutines en Go 1.22 y chi from Gherkin feature spec."
+    "description": "Service API of transactional-system-go-chi, merged from 1 feature contract(s) in contracts/."
   },
   "paths": {
     "/api/v1/orquestaci-n-de-saga-idempotente-con-goroutines-en-go-1-22-y-chi": {

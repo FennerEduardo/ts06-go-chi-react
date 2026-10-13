@@ -10,18 +10,19 @@ describe('OrquestacionDeSagaIdempotenteConGoroutinesEnGo122YChi API client', () 
     expect(COMMANDS).toEqual(['process_orquestacion_de_saga_idempotente_con_goroutines_en_go122_y_chi']);
   });
 
-  it('posts the command with tenant and idempotency headers', async () => {
-    const fetch = fakeFetch(201, { type: 'ProcessOrquestacionDeSagaIdempotenteConGoroutinesEnGo122YChiCompleted', aggregateId: 'agg-1', version: 1 });
-    const client = createOrquestacionDeSagaIdempotenteConGoroutinesEnGo122YChiClient({ baseUrl: 'https://api.test/', tenantId: 'acme', fetch });
+  it('posts the command with the bearer token and idempotency key', async () => {
+    const fetch = fakeFetch(202, { status: 'created', eventType: 'ProcessOrquestacionDeSagaIdempotenteConGoroutinesEnGo122YChiCompleted', aggregateId: 'agg-1', version: 1 });
+    const client = createOrquestacionDeSagaIdempotenteConGoroutinesEnGo122YChiClient({ baseUrl: 'https://api.test/', token: 'jwt-1', fetch });
 
     const result = await client.processOrquestacionDeSagaIdempotenteConGoroutinesEnGo122YChi('agg-1', { amount: 100 }, { idempotencyKey: 'key-1' });
 
-    expect(result).toEqual({ type: 'ProcessOrquestacionDeSagaIdempotenteConGoroutinesEnGo122YChiCompleted', aggregateId: 'agg-1', version: 1 });
+    expect(result).toEqual({ type: 'ProcessOrquestacionDeSagaIdempotenteConGoroutinesEnGo122YChiCompleted', aggregateId: 'agg-1', version: 1, status: 'created' });
     const [url, init] = fetch.mock.calls[0];
     expect(url).toBe('https://api.test/api/v1/orquestacion-de-saga-idempotente-con-goroutines-en-go122-y-chi/agg-1/process_orquestacion_de_saga_idempotente_con_goroutines_en_go122_y_chi');
     expect(init?.method).toBe('POST');
-    expect((init?.headers as Record<string, string>)['X-Tenant-Id']).toBe('acme');
-    expect((init?.headers as Record<string, string>)['X-Idempotency-Key']).toBe('key-1');
+    expect((init?.headers as Record<string, string>).Authorization).toBe('Bearer jwt-1');
+    expect((init?.headers as Record<string, string>)['X-Tenant-Id']).toBeUndefined();
+    expect((init?.headers as Record<string, string>)['Idempotency-Key']).toBe('key-1');
     expect(JSON.parse(String(init?.body))).toEqual({ amount: 100 });
   });
 
