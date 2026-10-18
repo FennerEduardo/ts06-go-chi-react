@@ -18,7 +18,6 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgxpool"
-	amqp "github.com/rabbitmq/amqp091-go"
 	"go.opentelemetry.io/otel"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
 	"go.opentelemetry.io/otel/sdk/trace/tracetest"
@@ -39,33 +38,69 @@ func init() {
 type env struct {
 	ctx    context.Context
 	pool   *pgxpool.Pool
-	conn   *amqp.Connection
+	broker Broker
 	schema string
 	topo   Topology
 }
 
 func uid() string { return strings.ReplaceAll(uuid.NewString(), "-", "")[:12] }
 
+// setup connects to PostgreSQL and the selected broker (GHK_BROKER: rabbitmq with AMQP_URL, pubsub with
+// PUBSUB_PROJECT_ID [+ PUBSUB_EMULATOR_HOST], servicebus).
 func setup(t *testing.T) *env {
 	t.Helper()
-	dbURL, amqpURL := os.Getenv("DATABASE_URL"), os.Getenv("AMQP_URL")
-	if dbURL == "" || amqpURL == "" {
-		t.Fatal("integration tests need DATABASE_URL and AMQP_URL (see docs/RUNTIME-KERNEL.md)")
+	dbURL := os.Getenv("DATABASE_URL")
+	if dbURL == "" || !BrokerConfigured() {
+		t.Fatal("integration tests need DATABASE_URL and the broker variables (see docs/RUNTIME-KERNEL.md)")
 	}
 	ctx := context.Background()
 	pool, err := pgxpool.New(ctx, dbURL)
 	must(t, err)
-	conn, err := amqp.Dial(amqpURL)
+	broker, err := ConnectBroker(ctx)
 	must(t, err)
-	e := &env{ctx: ctx, pool: pool, conn: conn, schema: "it_" + uid(), topo: TopologyFor("it-" + uid())}
+	e := &env{ctx: ctx, pool: pool, broker: broker, schema: "it_" + uid()}
+	// Brokers with fixed entities (Service Bus emulator) share one topology, emptied before each test.
+	if broker.DynamicTopology() {
+		e.topo = TopologyFor("it-" + uid())
+	} else {
+		e.topo = TopologyFor("it")
+	}
 	must(t, Migrate(ctx, pool, e.schema))
+	must(t, broker.Declare(ctx, e.topo))
+	if !broker.DynamicTopology() {
+		e.receive(t, e.topo.Queue, 0)
+		e.receive(t, e.topo.DLQ, 0)
+	}
 	exporter.Reset()
 	t.Cleanup(func() {
 		_, _ = pool.Exec(ctx, "DROP SCHEMA IF EXISTS "+e.schema+" CASCADE")
-		_ = conn.Close()
+		_ = broker.Close()
 		pool.Close()
 	})
 	return e
+}
+
+// receive acknowledges messages until expected arrived and the source stays quiet for 500 ms (10 s at most).
+func (e *env) receive(t *testing.T, source string, expected int) []BrokerMessage {
+	t.Helper()
+	sub, err := e.broker.Subscribe(e.ctx, source, e.topo)
+	must(t, err)
+	defer sub.Close()
+	var out []BrokerMessage
+	deadline := time.Now().Add(10 * time.Second)
+	quietSince := time.Now()
+	for time.Now().Before(deadline) && (len(out) < expected || time.Since(quietSince) < 500*time.Millisecond) {
+		d, err := sub.Poll(e.ctx)
+		must(t, err)
+		if d == nil {
+			time.Sleep(50 * time.Millisecond)
+			continue
+		}
+		out = append(out, d.Message)
+		must(t, d.Ack(e.ctx))
+		quietSince = time.Now()
+	}
+	return out
 }
 
 func must(t *testing.T, err error) {
@@ -88,34 +123,6 @@ func (e *env) service(t *testing.T) *CommandService {
 	return svc
 }
 
-func (e *env) channel(t *testing.T) *amqp.Channel {
-	ch, err := e.conn.Channel()
-	must(t, err)
-	return ch
-}
-
-func drainQueue(t *testing.T, ch *amqp.Channel, queue string) []amqp.Delivery {
-	var out []amqp.Delivery
-	for {
-		d, ok, err := ch.Get(queue, true)
-		must(t, err)
-		if !ok {
-			return out
-		}
-		out = append(out, d)
-	}
-}
-
-func waitFor(t *testing.T, check func() bool) {
-	t.Helper()
-	deadline := time.Now().Add(10 * time.Second)
-	for !check() {
-		if time.Now().After(deadline) {
-			t.Fatal("timed out waiting for condition")
-		}
-		time.Sleep(50 * time.Millisecond)
-	}
-}
 
 func TestIT1AtomicWriteAndRollback(t *testing.T) {
 	e := setup(t)
@@ -187,15 +194,19 @@ func TestIT3ConcurrentRelaysPublishExactlyOnce(t *testing.T) {
 		_, err := svc.Handle(e.ctx, CommandRequest{TenantID: "t1", AggregateID: fmt.Sprintf("agg-%d", i), Command: command})
 		must(t, err)
 	}
-	setupCh := e.channel(t)
-	must(t, DeclareTopology(setupCh, e.topo))
 	totals := make([]int, 2)
 	var wg sync.WaitGroup
 	for i, worker := range []string{"relay-a", "relay-b"} {
 		wg.Add(1)
 		go func(i int, worker string) {
 			defer wg.Done()
-			relay, err := NewOutboxRelay(e.pool, e.channel(t), e.topo.Exchange, e.schema)
+			publisher, err := e.broker.Publisher(e.ctx, e.topo.Exchange)
+			if err != nil {
+				t.Error(err)
+				return
+			}
+			defer publisher.Close()
+			relay, err := NewOutboxRelay(e.pool, publisher, e.schema)
 			if err != nil {
 				t.Error(err)
 				return
@@ -220,13 +231,13 @@ func TestIT3ConcurrentRelaysPublishExactlyOnce(t *testing.T) {
 	if n := e.count(t, "ghk_outbox", "published_at IS NULL"); n != 0 {
 		t.Fatalf("%d rows unpublished", n)
 	}
-	waitFor(t, func() bool { q, err := setupCh.QueueDeclarePassive(e.topo.Queue, true, false, false, false, nil); return err == nil && q.Messages == 20 })
+	received := e.receive(t, e.topo.Queue, 20)
 	ids := map[string]bool{}
-	for _, d := range drainQueue(t, setupCh, e.topo.Queue) {
-		ids[d.MessageId] = true
+	for _, m := range received {
+		ids[m.MessageID] = true
 	}
-	if len(ids) != 20 {
-		t.Fatalf("unique messages = %d, want 20", len(ids))
+	if len(received) != 20 || len(ids) != 20 {
+		t.Fatalf("received %d messages, %d unique, want 20", len(received), len(ids))
 	}
 }
 
@@ -285,10 +296,12 @@ func TestIT5SagaCompensatesInReverseOrder(t *testing.T) {
 
 func TestIT6InboxDeduplicatesAndDeadLetters(t *testing.T) {
 	e := setup(t)
-	ch := e.channel(t)
-	must(t, DeclareTopology(ch, e.topo))
+	publisher, err := e.broker.Publisher(e.ctx, e.topo.Exchange)
+	must(t, err)
+	sub, err := e.broker.Subscribe(e.ctx, e.topo.Queue, e.topo)
+	must(t, err)
 	var handled []string
-	consumer, err := NewInboxConsumer(e.pool, ch, e.topo.Queue, "it-consumer", func(_ context.Context, event map[string]any, meta Meta) error {
+	consumer, err := NewInboxConsumer(e.pool, sub, "it-consumer", func(_ context.Context, event map[string]any, meta Meta) error {
 		if event["poison"] == true {
 			return errors.New("cannot process")
 		}
@@ -297,22 +310,23 @@ func TestIT6InboxDeduplicatesAndDeadLetters(t *testing.T) {
 	}, e.schema)
 	must(t, err)
 	publish := func(id, body string) {
-		must(t, ch.PublishWithContext(e.ctx, e.topo.Exchange, "Test", false, false, amqp.Publishing{MessageId: id, Headers: amqp.Table{"tenant_id": "t1"}, Body: []byte(body)}))
+		must(t, publisher.Publish(e.ctx, BrokerMessage{MessageID: id, EventType: "Test", TenantID: "t1", Body: []byte(body)}))
 	}
 	publish("m-1", `{"ok": true}`)
 	publish("m-1", `{"ok": true}`)
 	publish("m-poison", `{"poison": true}`)
 	_, err = consumer.Drain(e.ctx, time.Second)
 	must(t, err)
+	_ = sub.Close()
+	_ = publisher.Close()
 	if !reflect.DeepEqual(handled, []string{"m-1"}) {
 		t.Fatalf("handled %v", handled)
 	}
 	if n := e.count(t, "ghk_inbox", "consumer = $1", "it-consumer"); n != 1 {
 		t.Fatalf("inbox rows = %d", n)
 	}
-	waitFor(t, func() bool { q, err := ch.QueueDeclarePassive(e.topo.DLQ, true, false, false, false, nil); return err == nil && q.Messages == 1 })
-	dead := drainQueue(t, ch, e.topo.DLQ)
-	if len(dead) != 1 || dead[0].MessageId != "m-poison" {
+	dead := e.receive(t, e.topo.DLQ, 1)
+	if len(dead) != 1 || dead[0].MessageID != "m-poison" {
 		t.Fatalf("dead-lettered %v", dead)
 	}
 }
@@ -327,18 +341,22 @@ func TestIT7TraceContextPropagation(t *testing.T) {
 	if !strings.Contains(stored, "4bf92f3577b34da6a3ce929d0e0e4736") {
 		t.Fatalf("outbox traceparent %q", stored)
 	}
-	ch := e.channel(t)
-	must(t, DeclareTopology(ch, e.topo))
-	relay, err := NewOutboxRelay(e.pool, ch, e.topo.Exchange, e.schema)
+	publisher, err := e.broker.Publisher(e.ctx, e.topo.Exchange)
+	must(t, err)
+	relay, err := NewOutboxRelay(e.pool, publisher, e.schema)
 	must(t, err)
 	if n, err := relay.PublishBatch(e.ctx, "relay", 10); err != nil || n != 1 {
 		t.Fatalf("published %d err=%v", n, err)
 	}
+	_ = publisher.Close()
 	received := 0
-	consumer, err := NewInboxConsumer(e.pool, e.channel(t), e.topo.Queue, "trace-consumer", func(context.Context, map[string]any, Meta) error { received++; return nil }, e.schema)
+	sub, err := e.broker.Subscribe(e.ctx, e.topo.Queue, e.topo)
+	must(t, err)
+	consumer, err := NewInboxConsumer(e.pool, sub, "trace-consumer", func(context.Context, map[string]any, Meta) error { received++; return nil }, e.schema)
 	must(t, err)
 	_, err = consumer.Drain(e.ctx, time.Second)
 	must(t, err)
+	_ = sub.Close()
 	if received != 1 {
 		t.Fatalf("received %d", received)
 	}

@@ -6,9 +6,9 @@
     "description": "Service API of transactional-system-go-chi, merged from 1 feature contract(s) in contracts/."
   },
   "paths": {
-    "/api/v1/orquestaci-n-de-saga-idempotente-con-goroutines-en-go-1-22-y-chi": {
+    "/api/v1/orquestacion-de-saga-idempotente-con-goroutines-en-go122-y-chi": {
       "post": {
-        "summary": "POST /api/v1/orquestaci-n-de-saga-idempotente-con-goroutines-en-go-1-22-y-chi",
+        "summary": "POST /api/v1/orquestacion-de-saga-idempotente-con-goroutines-en-go122-y-chi",
         "operationId": "processOrquestacionDeSagaIdempotenteConGoroutinesEnGo122YChi",
         "security": [],
         "requestBody": {

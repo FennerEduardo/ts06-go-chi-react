@@ -8,7 +8,6 @@ import (
 
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
-	amqp "github.com/rabbitmq/amqp091-go"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/codes"
 	"go.opentelemetry.io/otel/trace"
@@ -25,79 +24,76 @@ type Meta struct {
 type Handler func(ctx context.Context, event map[string]any, meta Meta) error
 
 // InboxConsumer records the message id in ghk_inbox in the same transaction as the handler, so
-// redeliveries are acknowledged without running the handler twice. A handler error rejects the
-// message without requeue, so RabbitMQ dead-letters it to the DLQ.
+// redeliveries are acknowledged without running the handler twice. A handler error dead-letters the
+// message (RabbitMQ DLX, Pub/Sub / Service Bus dead-letter topic): it is not redelivered.
 type InboxConsumer struct {
-	pool    *pgxpool.Pool
-	ch      *amqp.Channel
-	queue   string
-	name    string
-	handler Handler
-	s       string
+	pool         *pgxpool.Pool
+	subscription EventSubscription
+	name         string
+	handler      Handler
+	s            string
 }
 
-func NewInboxConsumer(pool *pgxpool.Pool, ch *amqp.Channel, queue, name string, handler Handler, schema string) (*InboxConsumer, error) {
+func NewInboxConsumer(pool *pgxpool.Pool, subscription EventSubscription, name string, handler Handler, schema string) (*InboxConsumer, error) {
 	s, err := SchemaName(schema)
 	if err != nil {
 		return nil, err
 	}
-	return &InboxConsumer{pool: pool, ch: ch, queue: queue, name: name, handler: handler, s: s}, nil
+	return &InboxConsumer{pool: pool, subscription: subscription, name: name, handler: handler, s: s}, nil
 }
 
-// Drain processes messages until the queue stays idle for `idle`. It returns how many were processed.
+// Drain processes messages until the source stays idle for idle. It returns how many were processed.
 func (c *InboxConsumer) Drain(ctx context.Context, idle time.Duration) (int, error) {
-	deliveries, err := c.ch.Consume(c.queue, c.name, false, false, false, false, nil)
-	if err != nil {
-		return 0, err
-	}
-	defer c.ch.Cancel(c.name, false) //nolint:errcheck
 	processed := 0
-	for {
-		select {
-		case d, ok := <-deliveries:
-			if !ok {
-				return processed, nil
-			}
-			c.process(ctx, d)
-			processed++
-		case <-time.After(idle):
-			return processed, nil
+	idleSince := time.Now()
+	for time.Since(idleSince) < idle {
+		d, err := c.subscription.Poll(ctx)
+		if err != nil {
+			return processed, err
 		}
+		if d == nil {
+			time.Sleep(50 * time.Millisecond)
+			continue
+		}
+		c.process(ctx, d)
+		processed++
+		idleSince = time.Now()
 	}
+	return processed, nil
 }
 
-func (c *InboxConsumer) process(ctx context.Context, d amqp.Delivery) {
-	traceparent, _ := d.Headers["traceparent"].(string)
-	tenant, _ := d.Headers["tenant_id"].(string)
-	ctx, span := Tracer().Start(ContextFrom(ctx, traceparent), c.queue+" process",
+func (c *InboxConsumer) process(ctx context.Context, d *Delivery) {
+	m := d.Message
+	source := c.subscription.Source()
+	ctx, span := Tracer().Start(ContextFrom(ctx, m.Traceparent), source+" process",
 		trace.WithSpanKind(trace.SpanKindConsumer),
-		trace.WithAttributes(attribute.String("messaging.system", "rabbitmq"), attribute.String("messaging.destination.name", c.queue), attribute.String("messaging.message.id", d.MessageId)))
+		trace.WithAttributes(attribute.String("messaging.system", c.subscription.System()), attribute.String("messaging.destination.name", source), attribute.String("messaging.message.id", m.MessageID)))
 	defer span.End()
-	if err := c.handle(ctx, d, tenant); err != nil {
+	if err := c.handle(ctx, m); err != nil {
 		span.RecordError(err)
 		span.SetStatus(codes.Error, err.Error())
-		_ = d.Nack(false, false)
+		_ = d.DeadLetter(ctx)
 		return
 	}
-	_ = d.Ack(false)
+	_ = d.Ack(ctx)
 }
 
-func (c *InboxConsumer) handle(ctx context.Context, d amqp.Delivery, tenant string) error {
+func (c *InboxConsumer) handle(ctx context.Context, m BrokerMessage) error {
 	tx, err := c.pool.Begin(ctx)
 	if err != nil {
 		return err
 	}
 	defer tx.Rollback(ctx) //nolint:errcheck
-	tag, err := tx.Exec(ctx, "INSERT INTO "+c.s+".ghk_inbox (consumer, message_id) VALUES ($1, $2) ON CONFLICT DO NOTHING", c.name, d.MessageId)
+	tag, err := tx.Exec(ctx, "INSERT INTO "+c.s+".ghk_inbox (consumer, message_id) VALUES ($1, $2) ON CONFLICT DO NOTHING", c.name, m.MessageID)
 	if err != nil {
 		return err
 	}
 	if tag.RowsAffected() == 1 {
 		var event map[string]any
-		if err := json.Unmarshal(d.Body, &event); err != nil {
+		if err := json.Unmarshal(m.Body, &event); err != nil {
 			return fmt.Errorf("invalid message body: %w", err)
 		}
-		if err := c.handler(ctx, event, Meta{MessageID: d.MessageId, TenantID: tenant, EventType: d.Type, Tx: tx}); err != nil {
+		if err := c.handler(ctx, event, Meta{MessageID: m.MessageID, TenantID: m.TenantID, EventType: m.EventType, Tx: tx}); err != nil {
 			return err
 		}
 	}
