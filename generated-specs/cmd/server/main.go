@@ -20,6 +20,13 @@ func main() {
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
 
+	// OTLP export when OTEL_EXPORTER_OTLP_ENDPOINT is set (internal/runtime/otel.go).
+	stopTelemetry, err := runtime.StartTelemetry(ctx)
+	if err != nil {
+		log.Printf("telemetry export disabled: %v", err)
+	}
+	defer func() { _ = stopTelemetry(context.Background()) }()
+
 	pool, err := pgxpool.New(ctx, os.Getenv("DATABASE_URL"))
 	if err != nil {
 		log.Fatalf("DATABASE_URL: %v", err)
@@ -69,8 +76,11 @@ func relayUntilError(ctx context.Context, pool *pgxpool.Pool, workerID string) e
 		return err
 	}
 	defer broker.Close()
-	if err := broker.Declare(ctx, runtime.DefaultTopology); err != nil {
-		return err
+	// GHK_DECLARE_TOPOLOGY=false when infrastructure as code owns the topology (least-privilege credentials).
+	if os.Getenv("GHK_DECLARE_TOPOLOGY") != "false" {
+		if err := broker.Declare(ctx, runtime.DefaultTopology); err != nil {
+			return err
+		}
 	}
 	publisher, err := broker.Publisher(ctx, runtime.DefaultTopology.Exchange)
 	if err != nil {

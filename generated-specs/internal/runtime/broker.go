@@ -88,6 +88,8 @@ func BrokerKind() string {
 		return "pubsub"
 	case os.Getenv("SERVICEBUS_CONNECTION_STRING") != "" || os.Getenv("SERVICEBUS_NAMESPACE") != "":
 		return "servicebus"
+	case os.Getenv("KAFKA_BOOTSTRAP_SERVERS") != "":
+		return "kafka"
 	}
 	return DefaultBrokerKind
 }
@@ -99,6 +101,8 @@ func BrokerConfigured() bool {
 		return os.Getenv("PUBSUB_PROJECT_ID") != "" || os.Getenv("GOOGLE_CLOUD_PROJECT") != ""
 	case "servicebus":
 		return os.Getenv("SERVICEBUS_CONNECTION_STRING") != "" || os.Getenv("SERVICEBUS_NAMESPACE") != ""
+	case "kafka":
+		return os.Getenv("KAFKA_BOOTSTRAP_SERVERS") != ""
 	default:
 		return os.Getenv("AMQP_URL") != ""
 	}
@@ -117,8 +121,10 @@ func ConnectBroker(ctx context.Context) (Broker, error) {
 		return NewPubSubBrokerFromEnv()
 	case "servicebus":
 		return nil, errors.New("the Azure Service Bus adapter is not generated: set stack.messaging to \"servicebus\" and regenerate")
+	case "kafka":
+		return nil, errors.New("the Kafka adapter is not generated: set stack.messaging to \"kafka\" and regenerate")
 	default:
-		return nil, fmt.Errorf("unsupported GHK_BROKER: %s (rabbitmq, pubsub, servicebus)", kind)
+		return nil, fmt.Errorf("unsupported GHK_BROKER: %s (rabbitmq, pubsub, servicebus, kafka)", kind)
 	}
 }
 
