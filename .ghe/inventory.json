@@ -1,0 +1,378 @@
+{
+  "version": "2",
+  "cliVersion": "3.2.1",
+  "features": {
+    "features/go_chi_saga.feature": {
+      "checksum": "cce68ef84237f44654a3b4a602eb3b62bf83fe8ab0a47fd57ba4a51904ada150",
+      "contracts": {
+        "contracts/go-chi-saga/ADR-OrquestacionDeSagaIdempotenteConGoroutinesEnGo122YChi.md": "4ef3ac3d79e77a7f02c6e892a6a26746917a67ca6463720cfbf0a8b606abfaef",
+        "contracts/go-chi-saga/openapi.json": "555e33c212fc0540d701e5306e3ab58a9e5279035c5815debee7165adf566d1f",
+        "openapi.json": "52aa4c0a66d70a06a36ce3b6b018cb4101b339a3b0e7d5b625319729ecb545c9",
+        "contracts/go-chi-saga/asyncapi.json": "42be6e80036d6d240464f9944ad531176e532396684c75c0c5e4be642af207cb",
+        "asyncapi.json": "5319c819d1bc3eebcf45194670fb3cff8cea7c53ff602dc0fb8941ff18041a41",
+        "internal/contracts/orquestaciondesagaidempotentecongoroutinesengo122ychi.contract.go": "ef7019aaafcb8c992cca3e6b7a2eef31e81524367c19968295026fac41ce347e",
+        "internal/contracts/ports.go": "e392a3271e6e1e142ce4d6f847b78618e41a29dd1a956f583de1c42a923a5a9a"
+      }
+    }
+  },
+  "artifacts": [
+    {
+      "filePath": ".dockerignore",
+      "type": "test",
+      "checksum": "5a3a59ef39b78008ce7578e90159fd3c10b6e67912afd5e553bc4b0ed1a66c7a",
+      "feature": "features/go_chi_saga.feature",
+      "generatedAt": "2026-10-25T05:55:46.708Z"
+    },
+    {
+      "filePath": ".env.example",
+      "type": "config",
+      "checksum": "6adf278d72af685048d3841103dc068be891ea1773fb005b0e9f1c6539cef1a1",
+      "feature": "features/go_chi_saga.feature",
+      "generatedAt": "2026-10-25T05:55:46.708Z"
+    },
+    {
+      "filePath": "ADR-001-architecture-decisions.md",
+      "type": "other",
+      "checksum": "4ef3ac3d79e77a7f02c6e892a6a26746917a67ca6463720cfbf0a8b606abfaef",
+      "feature": "features/go_chi_saga.feature",
+      "generatedAt": "2026-10-25T05:55:46.708Z"
+    },
+    {
+      "filePath": "asyncapi.json",
+      "type": "contract",
+      "checksum": "5319c819d1bc3eebcf45194670fb3cff8cea7c53ff602dc0fb8941ff18041a41",
+      "feature": "features/go_chi_saga.feature",
+      "generatedAt": "2026-10-25T05:55:46.708Z"
+    },
+    {
+      "filePath": "cmd/server/main.go",
+      "type": "test",
+      "checksum": "1fa7de04944c98c4148cd92e01be0664dd311272c0da0bbda4cea9fa35dc7f9e",
+      "feature": "features/go_chi_saga.feature",
+      "generatedAt": "2026-10-25T05:55:46.708Z"
+    },
+    {
+      "filePath": "contracts/go-chi-saga/ADR-OrquestacionDeSagaIdempotenteConGoroutinesEnGo122YChi.md",
+      "type": "other",
+      "checksum": "4ef3ac3d79e77a7f02c6e892a6a26746917a67ca6463720cfbf0a8b606abfaef",
+      "feature": "features/go_chi_saga.feature",
+      "generatedAt": "2026-10-25T05:55:46.708Z"
+    },
+    {
+      "filePath": "contracts/go-chi-saga/asyncapi.json",
+      "type": "contract",
+      "checksum": "42be6e80036d6d240464f9944ad531176e532396684c75c0c5e4be642af207cb",
+      "feature": "features/go_chi_saga.feature",
+      "generatedAt": "2026-10-25T05:55:46.708Z"
+    },
+    {
+      "filePath": "contracts/go-chi-saga/openapi.json",
+      "type": "openapi",
+      "checksum": "555e33c212fc0540d701e5306e3ab58a9e5279035c5815debee7165adf566d1f",
+      "feature": "features/go_chi_saga.feature",
+      "generatedAt": "2026-10-25T05:55:46.708Z"
+    },
+    {
+      "filePath": "docker-compose.yml",
+      "type": "config",
+      "checksum": "5e6e079bec6113ec28b7bc0df8a7bee119fe505a182f23802faebfa3ca751418",
+      "feature": "features/go_chi_saga.feature",
+      "generatedAt": "2026-10-25T05:55:46.708Z"
+    },
+    {
+      "filePath": "Dockerfile",
+      "type": "test",
+      "checksum": "35417585eaeb99583c0ded380d554acbf5440332b7a9f52f5ccf8ca0b1e6d5a4",
+      "feature": "features/go_chi_saga.feature",
+      "generatedAt": "2026-10-25T05:55:46.708Z"
+    },
+    {
+      "filePath": "features/go_chi_saga.feature",
+      "type": "other",
+      "checksum": "cce68ef84237f44654a3b4a602eb3b62bf83fe8ab0a47fd57ba4a51904ada150",
+      "feature": "features/go_chi_saga.feature",
+      "generatedAt": "2026-10-25T05:55:46.708Z"
+    },
+    {
+      "filePath": "fixtures.ts",
+      "type": "fixture",
+      "checksum": "c4f6e9186285e8b2d60e397e3f34ea68aaa3f40fd71d6a3b4dd954904446b1e7",
+      "feature": "features/go_chi_saga.feature",
+      "generatedAt": "2026-10-25T05:55:46.708Z"
+    },
+    {
+      "filePath": "frontend/index.html",
+      "type": "test",
+      "checksum": "fe1da620152e763aa9b46c5be3d45ad45830523ffa9fd807a2e1ade48845ccd0",
+      "feature": "features/go_chi_saga.feature",
+      "generatedAt": "2026-10-25T05:55:46.708Z"
+    },
+    {
+      "filePath": "frontend/package.json",
+      "type": "test",
+      "checksum": "c4492e77d9d1bb8c960ce15fa2fcab983d6965631becd716b7d2c344f5b676ed",
+      "feature": "features/go_chi_saga.feature",
+      "generatedAt": "2026-10-25T05:55:46.708Z"
+    },
+    {
+      "filePath": "frontend/src/api/orquestacion-de-saga-idempotente-con-goroutines-en-go122-y-chi-client.test.ts",
+      "type": "test",
+      "checksum": "03ba04ff0a1e9b62b6a97faf829bfa79c33094778570b6bc593958d8588d31b4",
+      "feature": "features/go_chi_saga.feature",
+      "generatedAt": "2026-10-25T05:55:46.708Z"
+    },
+    {
+      "filePath": "frontend/src/api/orquestacion-de-saga-idempotente-con-goroutines-en-go122-y-chi-client.ts",
+      "type": "test",
+      "checksum": "859d74f52bbcdd53f374675d773e4b2923953bd4fbd867697042fabd8b33148e",
+      "feature": "features/go_chi_saga.feature",
+      "generatedAt": "2026-10-25T05:55:46.708Z"
+    },
+    {
+      "filePath": "frontend/src/components/OrquestacionDeSagaIdempotenteConGoroutinesEnGo122YChiPanel.test.tsx",
+      "type": "test",
+      "checksum": "cae2433d135582c6b7ca00556709cd47a9cdb7ed7acf3343514619bd47243804",
+      "feature": "features/go_chi_saga.feature",
+      "generatedAt": "2026-10-25T05:55:46.708Z"
+    },
+    {
+      "filePath": "frontend/src/components/OrquestacionDeSagaIdempotenteConGoroutinesEnGo122YChiPanel.tsx",
+      "type": "test",
+      "checksum": "7a22890a418838200f15b71f0b6f260d4f329b9408bf3bef54134ec47a6f68ff",
+      "feature": "features/go_chi_saga.feature",
+      "generatedAt": "2026-10-25T05:55:46.708Z"
+    },
+    {
+      "filePath": "frontend/src/main.tsx",
+      "type": "test",
+      "checksum": "18ec5f62d43e4f5530ac5bd53375d44a113639f055e4ff610b22dc4cd9d93bb2",
+      "feature": "features/go_chi_saga.feature",
+      "generatedAt": "2026-10-25T05:55:46.708Z"
+    },
+    {
+      "filePath": "frontend/src/setupTests.ts",
+      "type": "test",
+      "checksum": "91a3c8962a0edcb956206a501d943fe99e1c78c6d4d8b5c9a948a3362c75978c",
+      "feature": "features/go_chi_saga.feature",
+      "generatedAt": "2026-10-25T05:55:46.708Z"
+    },
+    {
+      "filePath": "frontend/src/store/orquestacionDeSagaIdempotenteConGoroutinesEnGo122YChiSlice.test.ts",
+      "type": "test",
+      "checksum": "2c6176fae7cb9f0ff0d5ee6e7a4862d05372a57f2620ca5c78685657e5f45323",
+      "feature": "features/go_chi_saga.feature",
+      "generatedAt": "2026-10-25T05:55:46.708Z"
+    },
+    {
+      "filePath": "frontend/src/store/orquestacionDeSagaIdempotenteConGoroutinesEnGo122YChiSlice.ts",
+      "type": "test",
+      "checksum": "ae73bf7f5a23af5b8de40b7cdbf85d75b7784d94af55cca95bb6a05625fb956f",
+      "feature": "features/go_chi_saga.feature",
+      "generatedAt": "2026-10-25T05:55:46.708Z"
+    },
+    {
+      "filePath": "frontend/src/store/store.ts",
+      "type": "test",
+      "checksum": "a10b88fe1da09f0adde2e9c9156c73b048e073aad8d7c4fa54e7e085918072bd",
+      "feature": "features/go_chi_saga.feature",
+      "generatedAt": "2026-10-25T05:55:46.708Z"
+    },
+    {
+      "filePath": "frontend/src/vite-env.d.ts",
+      "type": "test",
+      "checksum": "65996936fbb042915f7b74a200fcdde7e410f32a669b1ab9597cfaa4b0faddb5",
+      "feature": "features/go_chi_saga.feature",
+      "generatedAt": "2026-10-25T05:55:46.708Z"
+    },
+    {
+      "filePath": "frontend/tsconfig.json",
+      "type": "test",
+      "checksum": "eeaa7e4b98fdd40c5c63c132c526340c380f8a68fff33ed39266eadbe7cea605",
+      "feature": "features/go_chi_saga.feature",
+      "generatedAt": "2026-10-25T05:55:46.708Z"
+    },
+    {
+      "filePath": "frontend/vite.config.ts",
+      "type": "test",
+      "checksum": "fcd047ac9f225a8a55fb19f2f29f5c91dad0560ecfdb714be494914244bec20f",
+      "feature": "features/go_chi_saga.feature",
+      "generatedAt": "2026-10-25T05:55:46.708Z"
+    },
+    {
+      "filePath": "go.mod",
+      "type": "config",
+      "checksum": "74757335adf35db73b2a284d04f12aad50ce448a3de5093fe8d1be414b4128c8",
+      "feature": "features/go_chi_saga.feature",
+      "generatedAt": "2026-10-25T05:55:46.708Z"
+    },
+    {
+      "filePath": "internal/contracts/orquestaciondesagaidempotentecongoroutinesengo122ychi.contract.go",
+      "type": "contract",
+      "checksum": "ef7019aaafcb8c992cca3e6b7a2eef31e81524367c19968295026fac41ce347e",
+      "feature": "features/go_chi_saga.feature",
+      "generatedAt": "2026-10-25T05:55:46.708Z"
+    },
+    {
+      "filePath": "internal/contracts/ports.go",
+      "type": "config",
+      "checksum": "e392a3271e6e1e142ce4d6f847b78618e41a29dd1a956f583de1c42a923a5a9a",
+      "feature": "features/go_chi_saga.feature",
+      "generatedAt": "2026-10-25T05:55:46.708Z"
+    },
+    {
+      "filePath": "internal/domain/kernel.go",
+      "type": "test",
+      "checksum": "35e9898cba6fe58e98906f15d982afa768f0ab1b739df4f965a6cd352eeb028f",
+      "feature": "features/go_chi_saga.feature",
+      "generatedAt": "2026-10-25T05:55:46.708Z"
+    },
+    {
+      "filePath": "internal/domain/orquestacion_de_saga_idempotente_con_goroutines_en_go122_y_chi_test.go",
+      "type": "test",
+      "checksum": "3edb37f729ab1e23740d1f6f28859d8c18e7b54e3fb50b69a891f509a4122749",
+      "feature": "features/go_chi_saga.feature",
+      "generatedAt": "2026-10-25T05:55:46.708Z"
+    },
+    {
+      "filePath": "internal/domain/orquestacion_de_saga_idempotente_con_goroutines_en_go122_y_chi.go",
+      "type": "test",
+      "checksum": "3176fa4c69953b919326843ed40c76bfe9dd13c292186a2cd9ab92010795910b",
+      "feature": "features/go_chi_saga.feature",
+      "generatedAt": "2026-10-25T05:55:46.708Z"
+    },
+    {
+      "filePath": "internal/httpapi/jwt.go",
+      "type": "test",
+      "checksum": "ffed8ee2800a7f029e3259d7fcf9b367e28cd159cf70a79303339ba42f6a705d",
+      "feature": "features/go_chi_saga.feature",
+      "generatedAt": "2026-10-25T05:55:46.708Z"
+    },
+    {
+      "filePath": "internal/httpapi/router_test.go",
+      "type": "test",
+      "checksum": "72e745e8d5bff48e100adae7803b8348bf48fb6946d51976ab4dd8ef8f48997b",
+      "feature": "features/go_chi_saga.feature",
+      "generatedAt": "2026-10-25T05:55:46.708Z"
+    },
+    {
+      "filePath": "internal/httpapi/router.go",
+      "type": "test",
+      "checksum": "66ba17394c017b567e2e7f940697b1ebd7753ce5f42ff647efd03122cf5aa6b7",
+      "feature": "features/go_chi_saga.feature",
+      "generatedAt": "2026-10-25T05:55:46.708Z"
+    },
+    {
+      "filePath": "internal/runtime/broker.go",
+      "type": "test",
+      "checksum": "e3ba43cb339a96791fd832a3f521b4f596ec91489a6e8417ab043d637578ba32",
+      "feature": "features/go_chi_saga.feature",
+      "generatedAt": "2026-10-25T05:55:46.708Z"
+    },
+    {
+      "filePath": "internal/runtime/command_service.go",
+      "type": "test",
+      "checksum": "888663aac9493473e87d7b6c3a1e009a1f882250e3c579ad5e3165936749a907",
+      "feature": "features/go_chi_saga.feature",
+      "generatedAt": "2026-10-25T05:55:46.708Z"
+    },
+    {
+      "filePath": "internal/runtime/http_integration_test.go",
+      "type": "test",
+      "checksum": "10ce691411ed5e0c179865629cfb930f27b0f269a677e4349f32a7793a7a7bd5",
+      "feature": "features/go_chi_saga.feature",
+      "generatedAt": "2026-10-25T05:55:46.708Z"
+    },
+    {
+      "filePath": "internal/runtime/inbox_consumer.go",
+      "type": "test",
+      "checksum": "04f79448afe15c74d16ee8b6b70ccbc28b3d0ba2e785d10d14b4cbe709fabb4b",
+      "feature": "features/go_chi_saga.feature",
+      "generatedAt": "2026-10-25T05:55:46.708Z"
+    },
+    {
+      "filePath": "internal/runtime/otel.go",
+      "type": "test",
+      "checksum": "855bde8c5f957420696d47fccfe3006b625f0958179d48c88bf3f187561480c8",
+      "feature": "features/go_chi_saga.feature",
+      "generatedAt": "2026-10-25T05:55:46.708Z"
+    },
+    {
+      "filePath": "internal/runtime/outbox_relay.go",
+      "type": "test",
+      "checksum": "9a270997d187292903a60c705d455fa68bdde9910b17b23a004792e5c2158b8c",
+      "feature": "features/go_chi_saga.feature",
+      "generatedAt": "2026-10-25T05:55:46.708Z"
+    },
+    {
+      "filePath": "internal/runtime/runtime_integration_test.go",
+      "type": "test",
+      "checksum": "30ac5afdba471283366dba36cadbc539f571046575ef9adf1eca2c9953acbbb7",
+      "feature": "features/go_chi_saga.feature",
+      "generatedAt": "2026-10-25T05:55:46.708Z"
+    },
+    {
+      "filePath": "internal/runtime/saga.go",
+      "type": "test",
+      "checksum": "222d641eb1ec1432c2f4720e1a79c3de18f5bebbc45c783400e646bc628c9dc6",
+      "feature": "features/go_chi_saga.feature",
+      "generatedAt": "2026-10-25T05:55:46.708Z"
+    },
+    {
+      "filePath": "internal/runtime/schema.go",
+      "type": "test",
+      "checksum": "2b42cb7322fbe7ed0331f79e65f2c5941fd70a1b51cf45872ef6027864aa7713",
+      "feature": "features/go_chi_saga.feature",
+      "generatedAt": "2026-10-25T05:55:46.708Z"
+    },
+    {
+      "filePath": "internal/runtime/telemetry.go",
+      "type": "test",
+      "checksum": "5e11ae9c08efde58bf4f7d0f0f6e00b051bfd98c688bdad00c23f7b962133b25",
+      "feature": "features/go_chi_saga.feature",
+      "generatedAt": "2026-10-25T05:55:46.708Z"
+    },
+    {
+      "filePath": "openapi.json",
+      "type": "openapi",
+      "checksum": "52aa4c0a66d70a06a36ce3b6b018cb4101b339a3b0e7d5b625319729ecb545c9",
+      "feature": "features/go_chi_saga.feature",
+      "generatedAt": "2026-10-25T05:55:46.708Z"
+    },
+    {
+      "filePath": "prompts/backend-agent.md",
+      "type": "prompt",
+      "checksum": "c96a93bfd9a34b405e73492845f0b7abf5e5632c69031c3accbec3e3a883272d",
+      "feature": "features/go_chi_saga.feature",
+      "generatedAt": "2026-10-25T05:55:46.708Z"
+    },
+    {
+      "filePath": "prompts/domain-agent.md",
+      "type": "prompt",
+      "checksum": "bdcab56c5710690de188b85bfc7fa430d4e928217eb39654747b95d20122289f",
+      "feature": "features/go_chi_saga.feature",
+      "generatedAt": "2026-10-25T05:55:46.708Z"
+    },
+    {
+      "filePath": "prompts/qa-agent.md",
+      "type": "prompt",
+      "checksum": "18a36238f7b15f5a3d42aef7deca63b25f7e1eace2ce5abf7fdec72b8346ea2e",
+      "feature": "features/go_chi_saga.feature",
+      "generatedAt": "2026-10-25T05:55:46.708Z"
+    },
+    {
+      "filePath": "seed.sql",
+      "type": "fixture",
+      "checksum": "df772b109f8941a85ea11e7411e6b8dcf94cb98350d1f3d6c769a5196e74ac3d",
+      "feature": "features/go_chi_saga.feature",
+      "generatedAt": "2026-10-25T05:55:46.708Z"
+    },
+    {
+      "filePath": "test/bdd/features_test.go",
+      "type": "test",
+      "checksum": "54c4401519ad25892a1169e810c132e1ae1d42c41a482ce50d0a3dc75665f49d",
+      "feature": "features/go_chi_saga.feature",
+      "generatedAt": "2026-10-25T05:55:46.708Z"
+    }
+  ],
+  "executions": []
+}
