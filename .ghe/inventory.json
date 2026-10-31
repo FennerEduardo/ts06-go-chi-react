@@ -1,6 +1,6 @@
 {
   "version": "2",
-  "cliVersion": "3.2.1",
+  "cliVersion": "3.2.2",
   "features": {
     "features/go_chi_saga.feature": {
       "checksum": "cce68ef84237f44654a3b4a602eb3b62bf83fe8ab0a47fd57ba4a51904ada150",
@@ -10,7 +10,7 @@
         "openapi.json": "52aa4c0a66d70a06a36ce3b6b018cb4101b339a3b0e7d5b625319729ecb545c9",
         "contracts/go-chi-saga/asyncapi.json": "42be6e80036d6d240464f9944ad531176e532396684c75c0c5e4be642af207cb",
         "asyncapi.json": "5319c819d1bc3eebcf45194670fb3cff8cea7c53ff602dc0fb8941ff18041a41",
-        "internal/contracts/orquestaciondesagaidempotentecongoroutinesengo122ychi.contract.go": "ef7019aaafcb8c992cca3e6b7a2eef31e81524367c19968295026fac41ce347e",
+        "internal/contracts/orquestaciondesagaidempotentecongoroutinesengo122ychi.contract.go": "00c029d57a6110e3f2d7d6f3b44622c8c02c796c49fb5b1711d914b80e5a5973",
         "internal/contracts/ports.go": "e392a3271e6e1e142ce4d6f847b78618e41a29dd1a956f583de1c42a923a5a9a"
       }
     }
@@ -208,9 +208,9 @@
     {
       "filePath": "internal/contracts/orquestaciondesagaidempotentecongoroutinesengo122ychi.contract.go",
       "type": "contract",
-      "checksum": "ef7019aaafcb8c992cca3e6b7a2eef31e81524367c19968295026fac41ce347e",
+      "checksum": "00c029d57a6110e3f2d7d6f3b44622c8c02c796c49fb5b1711d914b80e5a5973",
       "feature": "features/go_chi_saga.feature",
-      "generatedAt": "2026-10-25T05:55:46.708Z"
+      "generatedAt": "2026-10-30T20:48:12.101Z"
     },
     {
       "filePath": "internal/contracts/ports.go",
