@@ -11,26 +11,25 @@ services:
     environment:
       - APP_ENV=development
       - PORT=8080
-      - DATABASE_URL=${DATABASE_URL:-mysql://dev_user:dev_password@mysql:3306/transactional-system-go-chi_db}
+      - DATABASE_URL=${DATABASE_URL:-postgresql://dev_user:dev_password@postgresql:5432/transactional-system-go-chi_db}
     ports:
       - "8080:8080"
     depends_on:
-      - mysql
+      - postgresql
 
-  # Database Service (mysql)
-  mysql:
-    image: mysql:8.0
+  # Database Service (postgresql)
+  postgresql:
+    image: postgres:16-alpine
     container_name: transactional-system-go-chi-db
     restart: always
     environment:
-      MYSQL_DATABASE: ${MYSQL_DATABASE:-transactional-system-go-chi_db}
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root_password}
-      MYSQL_USER: ${MYSQL_USER:-dev_user}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-dev_password}
+      POSTGRES_DB: ${POSTGRES_DB:-transactional-system-go-chi_db}
+      POSTGRES_USER: ${POSTGRES_USER:-dev_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-dev_password}
     ports:
-      - "3306:3306"
+      - "5432:5432"
     volumes:
-      - db_data:/var/lib/mysql
+      - db_data:/var/lib/postgresql/data
 
   
 
