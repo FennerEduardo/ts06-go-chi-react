@@ -5,7 +5,7 @@
     "language": "go",
     "framework": "chi",
     "orm": "go-orm",
-    "database": "mysql",
+    "database": "postgresql",
     "validation": "go-validator",
     "auth": "jwt-bcrypt",
     "messaging": "none",
